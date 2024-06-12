@@ -19,7 +19,7 @@ router.post('/',[
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ 
-                message: 'Error create User'});
+                message: 'Error create User', error: errors});
         }
     const  existUser= await User.findOne({ name : req.body.name });
 
@@ -71,12 +71,12 @@ router.get('/', async function (req, res) {
 
 // PUT User
 
-router.put('/:id',[
+router.put('/:userId',[
     check('name', 'the name is require').not().isEmpty(),
     check('status', 'The status is require').isIn(['Active', 'Inactive']),
     check('email', 'the email is require').not().isEmpty(),
     check('password', 'the password is require').not().isEmpty(),
-    check('role', 'the role is require').isIn(['Admin','Teache,r'])
+    check('role', 'the role is require').isIn(['Admin','Teacher'])
     
 ], async function (req, res) {
 
@@ -102,7 +102,10 @@ router.put('/:id',[
     user.name = req.body.name;
     user.email = req.body.email;
     user.status = req.body.status;
-    user.password =  req.body.password;
+
+    const salt = bycript.genSaltSync();
+    const password = bycript.hashSync(req.body.password, salt);
+    user.password =  password;
     user.role = req.body.role;
     user.updated_at = new Date();
 

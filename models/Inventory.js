@@ -1,4 +1,4 @@
-const { schema, models } = require.monngose
+const { Schema, model } = require('mongoose')
 
 const InventorySchema = Schema({
 
@@ -24,8 +24,8 @@ const InventorySchema = Schema({
         type: String,
         required: true
     },
-    dateBuy: {
-        type: Date,
+    dayBuy: {
+        type: String,
         required: true
     },
     price: {
@@ -56,4 +56,4 @@ const InventorySchema = Schema({
 });
 
 
-module.exports = models('Inventory', InventorySchema);
+module.exports = model('Inventory', InventorySchema);

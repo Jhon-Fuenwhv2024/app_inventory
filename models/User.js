@@ -1,4 +1,4 @@
-const {schema, models} = require.monngose
+const { Schema, model} = require('mongoose')
 
 const UserSchema = Schema({
 
@@ -18,12 +18,12 @@ const UserSchema = Schema({
     role: {
         type: String,
         required: true,
-        enum: ['admin', 'teacher']
+        enum: ['Admin', 'Teacher']
     },
     status: {
         type: String,
         required: true,
-        enum: ['active', 'inactive']
+        enum: ['Active', 'Inactive']
     },
     created_at: {
         type: Date,
@@ -35,4 +35,4 @@ const UserSchema = Schema({
     },
 });
 
-module.exports = models('User', UserSchema);
+module.exports = model('User', UserSchema);

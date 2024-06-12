@@ -1,4 +1,4 @@
-const {schema, models} = require.monngose
+const { Schema, model} = require('mongoose')
 
 const BrandSchema = Schema({
 
@@ -9,7 +9,7 @@ const BrandSchema = Schema({
     status: {
         type: String,
         required: true,
-        enum: ['active', 'inactive']
+        enum: ['Active', 'Inactive']
     },
     created_at: {
         type: Date,
@@ -21,4 +21,4 @@ const BrandSchema = Schema({
     },
 });
 
-module.exports = models('Brand', BrandSchema);
+module.exports = model('Brand', BrandSchema);

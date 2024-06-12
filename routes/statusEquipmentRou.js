@@ -31,7 +31,7 @@ router.post('/',[
     statusEquipment.created_at = new Date();
     statusEquipment.updated_at = new Date();
 
-    statusEquipment = await StatusEquipment.save();
+    statusEquipment = await statusEquipment.save();
     res.status(201).json({
         message: 'StatusEquipment created successfully',
         statusEquipment
@@ -64,7 +64,7 @@ router.get('/', async function (req, res) {
 
 // Put statusEquipment
 
-router.put('/:id', [
+router.put('/:statusEquipmentId', [
     check('name', 'The name is require').not().isEmpty(),
     check('status', 'The status is required').isIn(['Active', 'Inactive'])
 ], async function (req, res) {
@@ -80,13 +80,13 @@ router.put('/:id', [
         if (!statusEquipment) {
 
             return res.status(404).json({ 
-                message: 'StatusEquipment not found'});
+                message: 'StatusEquipment not found', error: errors});
         }
 
     const existStatusEquipment = await StatusEquipment.findOne ({ name: req.body.name, _id: { $ne: statusEquipment._id}});
     if (existStatusEquipment) {
         return res.status(400).json({ 
-            message: 'StatusEquipment already exists'});
+            message: 'StatusEquipment already exists' });
     }
 
     statusEquipment.name = req.body.name;
@@ -96,7 +96,7 @@ router.put('/:id', [
     }catch (error) {
         console.log(error);
         res.status(500).json({
-            message: 'Error updating StatusEquipment'
+            message: 'Error updating StatusEquipment', error: error
         });
 
     }

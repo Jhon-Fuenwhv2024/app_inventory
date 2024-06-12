@@ -59,7 +59,7 @@ router.get('/', async function (req, res) {
 
 // PUT Brand
 
-router.put('/:id',[
+router.put('/:brandId',[
     check('name', 'the name is require').not().isEmpty(),
     check('status', 'The status is require').isIn(['Active', 'Inactive'])
 ], async function (req, res) {
@@ -67,8 +67,8 @@ router.put('/:id',[
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ 
-                message: 'Error update brand'});
+            return res.status(400).json({
+                message: 'Error update brand', error: errors});
         }
 
         let brand = await Brand.findById(req.params.brandId);

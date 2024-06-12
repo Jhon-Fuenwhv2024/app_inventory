@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 
-const getConnetion = async() => {
+const getConnection = async() => {
 
     try {
 
-        const uri = process.env.MONGOOSE_URI
+        const uri = process.env.MOONGOSE_URI;
 
         await mongoose.connect(uri);
 
@@ -16,5 +16,5 @@ const getConnetion = async() => {
 };
 
 module.exports = {
-    getConnetion
+    getConnection
 }
