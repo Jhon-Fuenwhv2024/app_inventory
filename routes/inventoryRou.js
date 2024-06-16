@@ -1,11 +1,12 @@
 const { Router } = require('express');
 const Inventory = require('../models/Inventory');
 const { validationResult, check } = require('express-validator');
-
+const {validateJwt} = require('../middleware/validar-jwt');
+const {validateRoleAdmin} = require('../middleware/validar-rol-admin');
 const router = Router();
 
 // Create Inventory
-router.post('/', [
+router.post('/',[ validateJwt, validateRoleAdmin ],  [
     check('serial', 'The serial is required').not().isEmpty(),
     check('model', 'The model is required').not().isEmpty(),
     check('description', 'The description is required').not().isEmpty(),
@@ -62,7 +63,7 @@ router.post('/', [
 
 // Inventory list
 
-router.get('/', async function (req, res) {
+router.get('/',[ validateJwt], async function (req, res) {
 
     try {
         const inventory = await Inventory.find().populate([
@@ -101,7 +102,7 @@ router.get('/', async function (req, res) {
 
 // PUT Inventory
 
-router.put('/:inventoryId', [
+router.put('/:inventoryId',[ validateJwt, validateRoleAdmin ], [
     check('serial', 'the serial is require').not().isEmpty(),
     check('model', 'the model is require').not().isEmpty(),
     check('description', 'the description is require').not().isEmpty(),
@@ -168,7 +169,7 @@ router.put('/:inventoryId', [
 
 // DELETE Brand
 
-router.delete('/:inventoryId', async function (req, res) {
+router.delete('/:inventoryId',[ validateJwt, validateRoleAdmin ], async function (req, res) {
 
     try {
         const inventory = await Inventory.findById(req.params.inventoryId);

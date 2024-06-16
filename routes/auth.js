@@ -2,20 +2,15 @@ const { Router } = require('express');
 const User = require('../models/User');
 const { validationResult, check} = require('express-validator');
 const bycript = require('bcryptjs')
-const { validateJwt } = require('../middleware/validar-jwt');
-const {validateRoleAdmin} = require('../middleware/validar-rol-admin');
-
+const {generateJwt} = require('../helper/jwt');
 
 const router = Router();
 
 // Create user
 
-router.post('/',[ validateJwt, validateRoleAdmin ],[
-    check('name', 'the name is require').not().isEmpty(),
+router.post('/',[
     check('email', 'the email is require').not().isEmpty(),
-    check('status', 'The status is require').isIn(['Active', 'Inactive']),
-    check('password', 'the password is require').not().isEmpty(),
-    check('role', 'the role is require').isIn(['Admin','Teacher']),
+    check('password', 'the password is require').not().isEmpty()
 ], async function (req, res) {
 
     try {                                                                                                                                                                                                                                  
@@ -24,30 +19,26 @@ router.post('/',[ validateJwt, validateRoleAdmin ],[
             return res.status(400).json({ 
                 message: 'Error create User', error: errors});
         }
-    const  existUser= await User.findOne({ name : req.body.name });
+    const  existUser= await User.findOne({ email : req.body.email });
 
-    if (existUser) {
+    if (!existUser) {
         return res.status(400).json({ 
-            message: 'The User already exist'});
+            message: 'The User not found'});
     }
 
-    let user = new User();
-    user.name = req.body.name;
-    user.email = req.body.email;
-    user.status = req.body.status;
+    const isEqual = bycript.compareSync(req.body.password, existUser.password);
+    if (!isEqual) {
+        return res.status(400).json({ 
+            message: 'The User not found or the password is incorrect'});
+    }
+    // generate token
+    const token = generateJwt(existUser)
 
-    const salt = bycript.genSaltSync();
-    const password = bycript.hashSync(req.body.password, salt);
-    user.password =  password;
-    
 
-    user.role = req.body.role;
-    user.created_at = new Date();
-    user.updated_at = new Date();
-
-    user = await user.save();
-    res.send(user);
-    console.log(user);
+    res.json({
+        _id: existUser._id, name: existUser.name,
+        role: existUser.role, email: existUser.email, access_token: token
+    });
 
     } catch (error) {
         console.log(error);
@@ -57,24 +48,9 @@ router.post('/',[ validateJwt, validateRoleAdmin ],[
 
 });
 
-// User list
-
-router.get('/',[ validateJwt, validateRoleAdmin ], async function (req, res) {
-
-    try {
-        const users = await User.find();
-        res.send(users);
-
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ 
-            message: 'Error get users'});
-    }
-});
-
 // PUT User
 
-router.put('/:userId',[ validateJwt ],[
+router.put('/:userId',[
     check('name', 'the name is require').not().isEmpty(),
     check('status', 'The status is require').isIn(['Active', 'Inactive']),
     check('email', 'the email is require').not().isEmpty(),
@@ -126,7 +102,7 @@ router.put('/:userId',[ validateJwt ],[
 
 // DELETE Brand
 
-router.delete('/:userId',[ validateJwt, validateRoleAdmin ], async function (req, res) {
+router.delete('/:userId', async function (req, res) {
 
     try {
         const user = await User.findById(req.params.userId);

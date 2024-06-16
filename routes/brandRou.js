@@ -1,12 +1,14 @@
 const { Router } = require('express');
 const Brand = require('../models/Brand');
 const { validationResult, check} = require('express-validator');
+const {validateJwt} = require('../middleware/validar-jwt');
+const {validateRoleAdmin} = require('../middleware/validar-rol-admin');
 
 const router = Router();
 
 // Create brand
 
-router.post('/',[
+router.post('/',[ validateJwt, validateRoleAdmin ],[
     check('name', 'the name is require').not().isEmpty(),
     check('status', 'The status is require').isIn(['Active', 'Inactive'])
 ], async function (req, res) {
@@ -44,7 +46,7 @@ router.post('/',[
 
 // Brands list
 
-router.get('/', async function (req, res) {
+router.get('/',[ validateJwt, validateRoleAdmin ], async function (req, res) {
 
     try {
         const brands = await Brand.find();
@@ -59,7 +61,7 @@ router.get('/', async function (req, res) {
 
 // PUT Brand
 
-router.put('/:brandId',[
+router.put('/:brandId',[ validateJwt, validateRoleAdmin ],[
     check('name', 'the name is require').not().isEmpty(),
     check('status', 'The status is require').isIn(['Active', 'Inactive'])
 ], async function (req, res) {
@@ -101,7 +103,7 @@ router.put('/:brandId',[
 
 // DELETE Brand
 
-router.delete('/:brandId', async function (req, res) {
+router.delete('/:brandId',[ validateJwt, validateRoleAdmin ], async function (req, res) {
 
     try {
         const brand = await Brand.findById(req.params.brandId);

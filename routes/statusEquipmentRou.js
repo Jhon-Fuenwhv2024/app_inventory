@@ -2,12 +2,14 @@ const { Router } = require('express');
 const StatusEquipment = require('../models/StatusEquipment');
 const { validationResult, check} = require('express-validator');
 const { status } = require('server/reply');
+const {validateJwt} = require('../middleware/validar-jwt');
+const {validateRoleAdmin} = require('../middleware/validar-rol-admin');
 
 const router = Router();
 
 // Create a new StatusEquipment
 
-router.post('/',[
+router.post('/',[ validateJwt, validateRoleAdmin ],[
     check('name', 'The name is require').not().isEmpty(),
     check('status', 'The status is required').isIn(['Active', 'Inactive'])
 ], async function (req, res) {
@@ -47,7 +49,7 @@ router.post('/',[
 
 // Get StatusEquipment
 
-router.get('/', async function (req, res) {
+router.get('/',[ validateJwt, validateRoleAdmin ], async function (req, res) {
 
     try {
         const statusEquipments = await StatusEquipment.find();
@@ -64,7 +66,7 @@ router.get('/', async function (req, res) {
 
 // Put statusEquipment
 
-router.put('/:statusEquipmentId', [
+router.put('/:statusEquipmentId',[ validateJwt, validateRoleAdmin ], [
     check('name', 'The name is require').not().isEmpty(),
     check('status', 'The status is required').isIn(['Active', 'Inactive'])
 ], async function (req, res) {
@@ -104,7 +106,7 @@ router.put('/:statusEquipmentId', [
 
 // Delete StatusEquipment
 
-router.delete('/:statusEquipmentId', async function (req, res) {
+router.delete('/:statusEquipmentId',[ validateJwt, validateRoleAdmin ], async function (req, res) {
 
     try {
         const statusEquipment = await StatusEquipment.findById(req.params.statusEquipmentId);

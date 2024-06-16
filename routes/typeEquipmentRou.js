@@ -1,12 +1,14 @@
 const { Router } = require('express');
 const TypeEquipment = require('../models/TypeEquipment');
 const { validationResult, check} = require('express-validator');
+const {validateJwt} = require('../middleware/validar-jwt');
+const {validateRoleAdmin} = require('../middleware/validar-rol-admin');
 
 const router = Router();
 
 // Create typeEquipment
 
-router.post('/',[
+router.post('/',[ validateJwt, validateRoleAdmin ], [
     check('name', 'the name is require').not().isEmpty(),
     check('status', 'The status is require').isIn(['Active', 'Inactive'])
 ], async function (req, res) {
@@ -44,7 +46,7 @@ router.post('/',[
 
 // TypeEquipment list
 
-router.get('/', async function (req, res) {
+router.get('/',[ validateJwt, validateRoleAdmin ], async function (req, res) {
 
     try {
         const typeEquipment = await TypeEquipment.find();
@@ -59,7 +61,7 @@ router.get('/', async function (req, res) {
 
 // PUT TypeEquipment
 
-router.put('/:typeEquipmentId',[
+router.put('/:typeEquipmentId',[ validateJwt, validateRoleAdmin ], [
     check('name', 'the name is require').not().isEmpty(),
     check('status', 'The status is require').isIn(['Active', 'Inactive'])
 ], async function (req, res) {
@@ -101,7 +103,7 @@ router.put('/:typeEquipmentId',[
 
 // DELETE TypeEquipment
 
-router.delete('/:typeEquipmentId', async function (req, res) {
+router.delete('/:typeEquipmentId',[ validateJwt, validateRoleAdmin ], async function (req, res) {
 
     try {
         const typeEquipment = await TypeEquipment.findById(req.params.typeEquipmentId);
